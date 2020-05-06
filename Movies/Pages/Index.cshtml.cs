@@ -56,11 +56,35 @@ namespace Movies.Pages
             SearchTerms = Request.Query["SearchTerms"];
             MPAARatings = Request.Query["MPAARatings"];
             Genres = Request.Query["Genres"];
-            Movies = MovieDatabase.Search(SearchTerms);
-            Movies = MovieDatabase.FilterByMPAARating(Movies, MPAARatings);
-            Movies = MovieDatabase.FilterByGenres(Movies, Genres);
-            Movies = MovieDatabase.FilterByIMDBRating(Movies, IMDBMin, IMDBMax);
-            Movies = MovieDatabase.FilterByTomRating(Movies, TomMin, TomMax);
+            Movies = MovieDatabase.All;
+
+            if (SearchTerms != null) {
+                Movies = Movies.Where(movie => movie.Title != null && movie.Title.Contains(SearchTerms, StringComparison.InvariantCultureIgnoreCase));
+            }
+            if (MPAARatings != null && MPAARatings.Length != 0) {
+                Movies = Movies.Where(movie => movie.MPAARating != null && MPAARatings.Contains(movie.MPAARating));
+            }
+            if (Genres != null && Genres.Length != 0) {
+                Movies = Movies.Where(movie => movie.MajorGenre != null && Genres.Contains(movie.MajorGenre));
+            }
+            if(IMDBMin != null && IMDBMax != null) {
+                Movies = Movies.Where(movie => movie.IMDBRating >= IMDBMin && movie.IMDBRating <= IMDBMax);
+            }
+            else if (IMDBMin != null) {
+                Movies = Movies.Where(movie => movie.IMDBRating >= IMDBMin);
+            }
+            else if (IMDBMax != null) {
+                Movies = Movies.Where(movie => movie.IMDBRating <= IMDBMax);
+            }
+            if (TomMin != null && TomMax != null) {
+                Movies = Movies.Where(movie => movie.RottenTomatoesRating >= TomMin && movie.RottenTomatoesRating <= TomMax);
+            }
+            else if (TomMin != null) {
+                Movies = Movies.Where(movie => movie.RottenTomatoesRating >= TomMin);
+            }
+            else if (TomMax != null) {
+                Movies = Movies.Where(movie => movie.RottenTomatoesRating <= TomMax);
+            }
         }
 
     }
